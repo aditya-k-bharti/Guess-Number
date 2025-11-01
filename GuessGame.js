@@ -70,7 +70,7 @@ function checkGuess(){
     } else{
       finalScore = Math.max(0, 100 - attempts -(hintsUsed * 5));
     }
-    showMessage(`🎉 Congratulations! You found the number ${secretNumber}!`, 'success');
+    showMessage(`🎉Congratulations! You found the number ${secretNumber}!`, 'success');
     scoreDisplay.textContent = finalScore;
     endGame();
   } else if(guess < secretNumber){
@@ -78,22 +78,22 @@ function checkGuess(){
 
     const difference = secretNumber - guess;
     if(difference <= 5){
-      showMessage("🔥 Very close! Your guess is too low!", 'warning');
+      showMessage("🔥Very close! Your guess is too low!", 'warning');
     } else if(difference <= 15){
-      showMessage("📈 Close! Your guess is too low!", 'warning');
+      showMessage("📈Close! Your guess is too low!", 'warning');
     } else{
-      showMessage("📉 Your guess is too low!", 'error');
+      showMessage("📉Your guess is too low!", 'error');
     }
   } else{
     // Too high 
 
     const difference = guess - secretNumber;
     if(difference <=5){
-      showMessage("🔥 Very close! Your guess is too high!", 'warning');
+      showMessage("🔥Very close! Your guess is too high!", 'warning');
     } else if(difference <= 15){
-      showMessage("📈 Close! Your guess is too high!", 'warning');
+      showMessage("📈Close! Your guess is too high!", 'warning');
     } else{
-      showMessage("📉 Your guess is too high!", 'error');
+      showMessage("📉Your guess is too high!", 'error');
     }
   }
 
