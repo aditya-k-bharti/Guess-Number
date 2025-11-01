@@ -78,7 +78,7 @@ function checkGuess(){
 
     const difference = secretNumber - guess;
     if(difference <= 5){
-      showMessage("🔥 Vaery close! Your guess is too low!", 'warning');
+      showMessage("🔥 Very close! Your guess is too low!", 'warning');
     } else if(difference <= 15){
       showMessage("📈 Close! Your guess is too low!", 'warning');
     } else{
