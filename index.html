@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎯Guess the Number Game</title>
+  <link rel="stylesheet" href="GuessGame.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+</head>
+<body>
+  <div class="background-animation"></div>
+
+  <main class="game-container">
+    <header class="game-header">
+      <h1 class="game-title">🎯 Guess the Number</h1>
+      <p class="game-subtitle">I'm thinking of a number between 0 and 100</p>
+    </header>
+
+    <div class="game-card">
+      <div class="input-section">
+        <div class="input-wrapper">
+          <input type="number" id="guessInput" class="guess-input" placeholder="Enter your guess..." min="0" max="100" autocomplete="off">
+          <button id="submitBtn" class="submit-btn" onclick="checkGuess()">
+            <span class="btn-text">Submit</span>
+            <span class="btn-icon">🚀</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="feedback-section">
+        <div id="message" class="message"></div>
+        <div class="stats-container">
+          <div class="stat-item">
+            <span class="stat-label">Attempts</span>
+            <span class="stat-value" id="attempts">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Score</span>
+            <span class="stat-value" id="score">100</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-section">
+        <button id="restartBtn" class="restart-btn" onclick="restartGame()">
+          <span class="btn-text">Play Again</span>
+          <span class="btn-icon">🔄️</span>
+        </button>
+        <button id="hintBtn" class="hint-btn" onclick="getHint()">
+          <span class="btn-text">Get Hint</span>
+          <span class="btn-icon">💡</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="game-info">
+      <div class="info-item">
+        <span class="info-icon">🎯</span>
+        <span class="info-text">Guess the secret number</span>
+      </div>
+      <div class="info-item">
+        <span class="info-icon">⚡</span>
+        <span class="info-text">Fewer attempts = Higher score</span>
+      </div>
+      <div class="info-item">
+        <span class="info-icon">🏆</span>
+        <span class="info-text">Can you get a perfect 100?</span>
+      </div>
+    </div>
+  </main>
+  <script src="GuessGame.js"></script>
+</body>
+</html>
