@@ -1,35 +1,122 @@
 // Game state 
 
 let secretNumber = Math.floor(Math.random()* 101);
-let attempts = 0;
-let gameOver = false;
-let hintsUsed = 0;
+let attempts     = 0;
+let gameOver     = false;
+let hintsUsed    = 0;
+let maxRange     = 100;
+let timeLeft     = 60;
+let timer;
+let streak       = localStorage.getItem("Streak") || 0;
+let history      = [];
 
 // DOM elements 
 
-const guessInput = document.getElementById('guessInput');
-const message = document.getElementById('message');
+const guessInput      = document.getElementById('guessInput');
+const message         = document.getElementById('message');
 const attemptsDisplay = document.getElementById('attempts');
-const scoreDisplay = document.getElementById('score');
-const submitBtn = document.getElementById('submitBtn');
-const restartBtn = document.getElementById('restartBtn');
-const hintBtn = document.getElementById('hintBtn');
+const scoreDisplay    = document.getElementById('score');
+const submitBtn       = document.getElementById('submitBtn');
+const restartBtn      = document.getElementById('restartBtn');
+const hintBtn         = document.getElementById('hintBtn');
+const timerDisplay    = document.getElementById('timer');
+const streakDisplay   = document.getElementById('streak');
+const progressBar     = document.getElementById('progressBar');
+const historyList     = document.getElementById('historyList');
+const leaderboardList = document.getElementById('leaderboard');
+const difficulty      = document.getElementById('difficulty');
 
 // Initialize game
 
 document.addEventListener('DOMContentLoaded', function(){
-  guessInput.focus();
-  updateDisplay();
+  startTimer();
+  streakDisplay.textContent = streak;
+  renderLeaderboard();
+  showMessage("🧠 Welcome to MindHunt! Let's test your brain...", 'warning');
 
-  // Add Enter key support
+  function startTimer(){
+    clearInterval(timer);
+    timeLeft = 60;
+    timerDisplay.textContent = timeLeft;
+
+    timer = setInterval(function(){
+      timeLeft--;
+      timerDisplay.textContent = timeLeft;
+
+      if(timeLeft <= 0){
+        showMessage(`⌛ Time Over! Number was ${secretNumber}.`, 'error');
+        streak = 0;
+        endGame();
+      }
+    }, 1000);
+  }
+
+  function checkGuess(){
+    if(gameOver) return;
+    const guess = parseInt(guessInput.value);
+    if(isNaN(guess)) return;
+    attempts++;
+    history.push(guess);
+    renderHistory();
+    updateProgress(guess);
+
+    if(guess === secretNumber){
+      let score = Math .max(0, 100 - attempts);
+      showMessage(`🏆 Genius! You cracked ${secretNumber} in ${attempts} moves!`, 'success');
+      scoreDisplay.textContent = score;
+      streak++;
+      localStorage.setItem("Streak", streak);
+      saveScore(score);
+      endGame();
+    } else if(attempts >= 10){
+      showMessage(`💀 Game Over! The number was ${secretNumber}.`, 'error');
+      streak = 0;
+      localStorage.setItem("Streak", streak);
+      endGame();
+    } else{
+      showMessage(guess < secretNumber ? "📉 Too Low!" : "📈 Too High!", 'warning');
+    }
+    guessInput.focus();
+    updateDisplay();
+  }
+
+  function updateProgress(guess){
+    let percent = (guess / maxRange) * 100;
+    progressBar.style.width = `${percent}%`;
+  }
+
+  function renderHistory(){
+    historyList.innerHTML = '';
+    history.forEach(num =>{
+      let li = document.createElement('li');
+      li.textContent = num;
+      historyList.appendChild(li);
+    });
+  }
+
+  function saveScore(score){
+    let scores = JSON.parse(localStorage.getItem("Scores")) || [];
+    scores.push(score);
+    scores.sort((a,b) => b - a);
+    localStorage.setItem("Scores", JSON.stringify(scores));
+    renderLeaderboard();
+  }
+
+  function renderLeaderboard(){
+    let scores = JSON.parse(localStorage.getItem("Scores")) || [];
+    leaderboardList.innerHTML = '';
+    scores.slice(0,5).forEach(s =>{
+      let li = document.createElement('li');
+      li.textContent = "⭐ " + s;
+      leaderboardList.appendChild(li);
+    });
+  }
 
   guessInput.addEventListener('keypress', function(e){
     if(e.key === 'Enter'){
       checkGuess();
     }
   });
-
-  // Add input validation
 
   guessInput.addEventListener('input', function(){
     const value = parseInt(this.value);
@@ -48,8 +135,6 @@ function checkGuess(){
   }
   const guess = parseInt(guessInput.value);
 
-  // Input validation
-
   if(isNaN(guess) || guess < 0 || guess > 100){
     showMessage("❗Please enter a number between 0 and 100!", 'error');
     guessInput.focus();
@@ -58,12 +143,8 @@ function checkGuess(){
 
   attempts++;
   updateDisplay();
-
-  // Check the guess 
   
   if(guess === secretNumber){
-    // Correct guess!
-
     let finalScore;
     if(attempts === 1){
       finalScore = 100;
@@ -74,8 +155,6 @@ function checkGuess(){
     scoreDisplay.textContent = finalScore;
     endGame();
   } else if(guess < secretNumber){
-    // Too low
-
     const difference = secretNumber - guess;
     if(difference <= 5){
       showMessage("🔥Very close! Your guess is too low!", 'warning');
@@ -85,8 +164,6 @@ function checkGuess(){
       showMessage("📉Your guess is too low!", 'error');
     }
   } else{
-    // Too high 
-
     const difference = guess - secretNumber;
     if(difference <=5){
       showMessage("🔥Very close! Your guess is too high!", 'warning');
@@ -97,12 +174,8 @@ function checkGuess(){
     }
   }
 
-  // Clear input and focus 
-
   guessInput.value = '';
   guessInput.focus();
-
-  // Add some encouragement based on attempts 
 
   if(attempts === 10 && !gameOver){
     setTimeout(()=>{
@@ -115,8 +188,6 @@ function showMessage(text , type = ''){
   message.textContent = text;
   message.className = `message ${type}`;
 
-  // Add animation 
-
   message.style.animation = 'none';
   message.offsetHeight;  // Trigger reflow
   message.style.animation = 'messageSlider 0.5s ease-out';
@@ -126,16 +197,15 @@ function updateDisplay(){
   attemptsDisplay.textContent = attempts;
   const currentScore = Math.max(0, 100 - attempts - (hintsUsed * 5));
   scoreDisplay.textContent = currentScore;
+  streakDisplay.textContent = streak;
 }
 
 function endGame(){
   gameOver = true;
-  guessInput.disabled = true;
+  clearInterval(timer);
   submitBtn.disabled = true;
   restartBtn.style.display = 'flex';
   hintBtn.style.display = 'none';
-
-  // Add celebration effect 
 
   setTimeout(()=>{
     document.body.style.animation = 'celebration 2s ease-in-out';
@@ -143,36 +213,18 @@ function endGame(){
 }
 
 function restartGame(){
-  // Reset game state 
-
-  secretNumber = Math.floor(Math.random() * 101);
+  maxRange = parseInt(difficulty.value);
+  secretNumber = Math.floor(Math.random() * maxRange); 
   attempts = 0;
   gameOver = false;
   hintsUsed = 0;
-
-  // Reset UI 
-
-  guessInput.disabled = false;
-  guessInput.value = '';
+  history = [];
   submitBtn.disabled = false;
   restartBtn.style.display = 'none';
-  hintBtn.style.display = 'flex';
-
-  // Clear message and reset display 
-
-  message.textContent = '';
-  message.className = 'message';
+  progressBar.style.width = '0%';
+  renderHistory();
   updateDisplay();
-
-  // Focus input 
-
-  guessInput.focus();
-
-  // Remove celebration effect 
-
-  document.body.style.animation = '';
-
-  console.log('New game started! Secret number:', secretNumber);  // For debugging 
+  startTimer();
 }
 
 function getHint(){
@@ -210,8 +262,6 @@ function getHint(){
     hintBtn.style.display = 'none';
   }
 }
-
-// Add celebration animation
 
 const style = document.createElement('style');
 style.textContent = `

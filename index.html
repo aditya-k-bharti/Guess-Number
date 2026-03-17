@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎯Guess the Number Game</title>
+  <title>🧠 MindHunt - A Brain Teaser</title>
   <link rel="stylesheet" href="GuessGame.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.gstatic.com" crossorigin>
@@ -14,17 +14,37 @@
 
   <main class="game-container">
     <header class="game-header">
-      <h1 class="game-title">🎯 Guess the Number</h1>
-      <p class="game-subtitle">I'm thinking of a number between 0 and 100</p>
+      <h1 class="game-title">🧠 MindHunt - A Brain Teaser</h1>
+      <p class="game-subtitle">Think Fast. Guess Smart.</p>
     </header>
 
     <div class="game-card">
+      <select id="difficulty" class="guess-input">
+        <option value="50">Easy</option>
+        <option value="100">Medium</option>
+        <option value="500">Hard</option>
+      </select>
+
+      <div class="stat-container">
+        <div class="stat-item">
+          <span class="stat-label">Time</span>
+          <span class="stat-value" id="timer">60</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Streak</span>
+          <span class="stat-value" id="streak">0</span>
+        </div>
+      </div>
+
+      <div class="progress">
+        <div id="progressBar"></div>
+      </div>
+
       <div class="input-section">
         <div class="input-wrapper">
           <input type="number" id="guessInput" class="guess-input" placeholder="Enter your guess..." min="0" max="100" autocomplete="off">
           <button id="submitBtn" class="submit-btn" onclick="checkGuess()">
-            <span class="btn-text">Submit</span>
-            <span class="btn-icon">🚀</span>
+            🚀 Fire Guess
           </button>
         </div>
       </div>
@@ -45,14 +65,24 @@
 
       <div class="action-section">
         <button id="restartBtn" class="restart-btn" onclick="restartGame()">
-          <span class="btn-text">Play Again</span>
-          <span class="btn-icon">🔄️</span>
+          🔄️ Hunt Again
         </button>
         <button id="hintBtn" class="hint-btn" onclick="getHint()">
-          <span class="btn-text">Get Hint</span>
-          <span class="btn-icon">💡</span>
+          💡Reveal Clue
         </button>
       </div>
+    </div>
+
+    <div class="game-info">
+      <div class="info-item">
+        <span class="info-text">📜 Guess History</span>
+      </div>
+      <ul id="history"></ul>
+
+      <div class="info-item">
+        <span class="info-text">🏆 Leaderboard:</span>
+      </div>
+      <ul id="leaderboard"></ul>
     </div>
 
     <div class="game-info">
@@ -69,6 +99,10 @@
         <span class="info-text">Can you get a perfect 100?</span>
       </div>
     </div>
+
+    <footer class="footer-main">
+      © 2026 MindHunt - A Brain Teaser | Built by Aditya
+    </footer>
   </main>
   <script src="GuessGame.js"></script>
 </body>
