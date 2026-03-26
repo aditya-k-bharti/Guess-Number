@@ -1,14 +1,16 @@
 // Game state 
 
-let secretNumber = Math.floor(Math.random()* 101);
 let attempts     = 0;
 let gameOver     = false;
 let hintsUsed    = 0;
 let maxRange     = 100;
+let secretNumber = Math.floor(Math.random()* maxRange);
 let timeLeft     = 60;
 let timer;
 let streak       = localStorage.getItem("Streak") || 0;
 let history      = [];
+let gameStarted  = false;
+let messageTimeout;
 
 // DOM elements 
 
@@ -24,64 +26,23 @@ const streakDisplay   = document.getElementById('streak');
 const progressBar     = document.getElementById('progressBar');
 const historyList     = document.getElementById('historyList');
 const leaderboardList = document.getElementById('leaderboard');
-const difficulty      = document.getElementById('difficulty');
 
 // Initialize game
 
 document.addEventListener('DOMContentLoaded', function(){
-  startTimer();
   streakDisplay.textContent = streak;
   renderLeaderboard();
   showMessage("🧠 Welcome to MindHunt! Let's test your brain...", 'warning');
 
-  function startTimer(){
-    clearInterval(timer);
-    timeLeft = 60;
-    timerDisplay.textContent = timeLeft;
-
-    timer = setInterval(function(){
-      timeLeft--;
-      timerDisplay.textContent = timeLeft;
-
-      if(timeLeft <= 0){
-        showMessage(`⌛ Time Over! Number was ${secretNumber}.`, 'error');
-        streak = 0;
-        endGame();
-      }
-    }, 1000);
-  }
-
-  function checkGuess(){
-    if(gameOver) return;
-    const guess = parseInt(guessInput.value);
-    if(isNaN(guess)) return;
-    attempts++;
-    history.push(guess);
-    renderHistory();
-    updateProgress(guess);
-
-    if(guess === secretNumber){
-      let score = Math .max(0, 100 - attempts);
-      showMessage(`🏆 Genius! You cracked ${secretNumber} in ${attempts} moves!`, 'success');
-      scoreDisplay.textContent = score;
-      streak++;
-      localStorage.setItem("Streak", streak);
-      saveScore(score);
-      endGame();
-    } else if(attempts >= 10){
-      showMessage(`💀 Game Over! The number was ${secretNumber}.`, 'error');
-      streak = 0;
-      localStorage.setItem("Streak", streak);
-      endGame();
-    } else{
-      showMessage(guess < secretNumber ? "📉 Too Low!" : "📈 Too High!", 'warning');
-    }
-    guessInput.focus();
-    updateDisplay();
-  }
+  guessInput.disabled = true;
+  submitBtn.textContent = "🎯 Start Hunt";
+  guessInput.placeholder = `Enter number (0 - ${maxRange})`;
+  guessInput.max = maxRange;
+  updateDifficultyColor(maxRange);
 
   function updateProgress(guess){
-    let percent = (guess / maxRange) * 100;
+    let diff = Math.abs(secretNumber - guess);
+    let percent = 100 - (diff / maxRange) * 100;
     progressBar.style.width = `${percent}%`;
   }
 
@@ -123,20 +84,71 @@ document.addEventListener('DOMContentLoaded', function(){
     if(value < 0){
       this.value = 0;
     }
-    if(value > 100){
-      this.value = 100;
+    if(value > maxRange){
+      this.value = maxRange;
     }
   });
 });
 
+function startTimer(){
+    clearInterval(timer);
+    timeLeft = 60;
+    timerDisplay.textContent = timeLeft;
+
+    timer = setInterval(function(){
+      timeLeft--;
+      timerDisplay.textContent = timeLeft;
+
+      if(timeLeft <= 0){
+        showMessage(`⌛ Time Over! Number was ${secretNumber}.`, 'error');
+        streak = 0;
+        endGame();
+      }
+    }, 1000);
+  }
+
+function handleGameStart(){
+  if(!gameStarted){
+    gameStarted = true;
+    guessInput.disabled = false;
+    submitBtn.textContent = '🚀 Fire Guess';
+    startTimer();
+  } else{
+    checkGuess();
+  }
+}
+
+function updateDifficultyColor(range){
+  if(range === 50){
+    difficultyBtn.style.background = "linear-gradient(135deg, #2ecc71, #27ae60)";
+  } else if(range === 100){
+    difficultyBtn.style.background = "linear-gradient(135deg, #3498db, #2980b9)";
+  } else if(range === 500){
+    difficultyBtn.style.background = "linear-gradient(135deg, #e74c3c, #c0392b)";
+  }
+}
+
+function updateBadge(score){
+  const badge = document.getElementById("badge");
+  if(score >= 80){
+    badge.textContent = "🏆 Legend";
+  } else if(score >= 50){
+    badge.textContent = "🔥 Pro";
+  } else{
+    badge.textContent = "😅 Beginner";
+  }
+}
+
 function checkGuess(){
+  history.push(guess);
+  renderHistory()
   if(gameOver){
     return;
   }
   const guess = parseInt(guessInput.value);
 
-  if(isNaN(guess) || guess < 0 || guess > 100){
-    showMessage("❗Please enter a number between 0 and 100!", 'error');
+  if(isNaN(guess) || guess < 0 || guess > maxRange){
+    showMessage(`❗Enter number between 0 - ${maxRange}!`, 'error');
     guessInput.focus();
     return;
   }
@@ -188,9 +200,17 @@ function showMessage(text , type = ''){
   message.textContent = text;
   message.className = `message ${type}`;
 
-  message.style.animation = 'none';
-  message.offsetHeight;  // Trigger reflow
-  message.style.animation = 'messageSlider 0.5s ease-out';
+  message.classList.add('show');
+
+  clearTimeout(messageTimeout);
+
+  messageTimeout = setTimeout(() =>{
+    message.classList.remove('show');
+    setTimeout(() =>{
+      message.textContent = "";
+      message.className = 'message';
+    }, 300);
+  }, 4000);
 }
 
 function updateDisplay(){
@@ -198,6 +218,7 @@ function updateDisplay(){
   const currentScore = Math.max(0, 100 - attempts - (hintsUsed * 5));
   scoreDisplay.textContent = currentScore;
   streakDisplay.textContent = streak;
+  updateBadge(currentScore);
 }
 
 function endGame(){
@@ -213,18 +234,24 @@ function endGame(){
 }
 
 function restartGame(){
-  maxRange = parseInt(difficulty.value);
+  clearInterval(timer);
   secretNumber = Math.floor(Math.random() * maxRange); 
   attempts = 0;
   gameOver = false;
   hintsUsed = 0;
   history = [];
+  gameStarted = false;
+  guessInput.disabled = true;
+  submitBtn.textContent = "🎯 Start Hunt";
   submitBtn.disabled = false;
   restartBtn.style.display = 'none';
+  hintBtn.style.display = 'flex';
   progressBar.style.width = '0%';
   renderHistory();
   updateDisplay();
-  startTimer();
+  timeLeft = 60;
+  timerDisplay.textContent = timeLeft;
+  showMessage("🧠 New Game! Click Start Hunt to begin.", 'warning');
 }
 
 function getHint(){
@@ -285,4 +312,71 @@ document.head.appendChild(style);
 // Console welcome message 
 
 console.log('🎯 Guess the Number Game loaded!');
+
+const difficultyBtn = document.getElementById('difficultyBtn')
+const difficultyOptions = document.getElementById('difficultyOptions');
+const items = document.querySelectorAll('.sort-item');
+
+difficultyBtn.addEventListener('click', () =>{
+  difficultyOptions.classList.toggle("show");
+  difficultyBtn.classList.toggle('active');
+});
+
+items.forEach(item => {
+  item.addEventListener("click", () =>{
+    const newRange = parseInt(item.dataset.value);
+    if(gameStarted){
+      if(timeLeft <= 30){
+        showMessage("⛔ Cannot change difficulty after 30s!", "error");
+        difficultyOptions.classList.remove("show");
+        difficultyBtn.classList.remove("active");
+        return;
+      }
+      
+      maxRange = newRange;
+      updateDifficultyColor(maxRange);
+      guessInput.placeholder = `Enter number (0 - ${maxRange})`;
+      guessInput.max = maxRange;
+      secretNumber = Math.floor(Math.random() * maxRange);
+      clearInterval(timer);
+      gameStarted = false;
+      guessInput.disabled = true;
+      submitBtn.textContent = "🎯 Start Hunt";
+      timeLeft = 60;
+      timerDisplay.textContent = timeLeft;
+      history = [];
+      attempts = 0;
+      progressBar.style.width = "0%";
+      updateDisplay();
+      showMessage(`🔄 Difficulty changed! Now guess between 0 - ${maxRange}`, "warning");
+      difficultyBtn.textContent = `Difficulty: ${item.textContent}`;
+      items.forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      difficultyOptions.classList.remove("show");
+      difficultyBtn.classList.remove('active');
+      restartGame();
+      return;
+    }
+
+    maxRange = newRange;
+    updateDifficultyColor(maxRange);
+    guessInput.placeholder = `Enter number (0 - ${maxRange})`;
+    guessInput.max = maxRange;
+    secretNumber = Math.floor(Math.random() * maxRange);
+    showMessage(`🎯 Difficulty set! Guess between 0 - ${maxRange}`, "success");
+    difficultyBtn.textContent = `Difficulty: ${item.textContent}`;
+    items.forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+    difficultyOptions.classList.remove("show");
+    difficultyBtn.classList.remove('active');
+  });
+});
+
+document.addEventListener('click', (e) => {
+  if(!e.target.closest(".filter-wrapper")){
+    difficultyOptions.classList.remove("show");
+    difficultyBtn.classList.remove("active");
+  }
+});
+
 console.log('Secret number for this round:', secretNumber);
