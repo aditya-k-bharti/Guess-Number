@@ -40,39 +40,6 @@ document.addEventListener('DOMContentLoaded', function(){
   guessInput.max = maxRange;
   updateDifficultyColor(maxRange);
 
-  function updateProgress(guess){
-    let diff = Math.abs(secretNumber - guess);
-    let percent = 100 - (diff / maxRange) * 100;
-    progressBar.style.width = `${percent}%`;
-  }
-
-  function renderHistory(){
-    historyList.innerHTML = '';
-    history.forEach(num =>{
-      let li = document.createElement('li');
-      li.textContent = num;
-      historyList.appendChild(li);
-    });
-  }
-
-  function saveScore(score){
-    let scores = JSON.parse(localStorage.getItem("Scores")) || [];
-    scores.push(score);
-    scores.sort((a,b) => b - a);
-    localStorage.setItem("Scores", JSON.stringify(scores));
-    renderLeaderboard();
-  }
-
-  function renderLeaderboard(){
-    let scores = JSON.parse(localStorage.getItem("Scores")) || [];
-    leaderboardList.innerHTML = '';
-    scores.slice(0,5).forEach(s =>{
-      let li = document.createElement('li');
-      li.textContent = "⭐ " + s;
-      leaderboardList.appendChild(li);
-    });
-  }
-
   guessInput.addEventListener('keypress', function(e){
     if(e.key === 'Enter'){
       checkGuess();
@@ -89,6 +56,39 @@ document.addEventListener('DOMContentLoaded', function(){
     }
   });
 });
+
+function saveScore(score){
+  let scores = JSON.parse(localStorage.getItem("Scores")) || [];
+  scores.push(score);
+  scores.sort((a,b) => b - a);
+  localStorage.setItem("Scores", JSON.stringify(scores));
+  renderLeaderboard();
+}
+
+function renderLeaderboard(){
+  let scores = JSON.parse(localStorage.getItem("Scores")) || [];
+  leaderboardList.innerHTML = '';
+  scores.slice(0,5).forEach(s =>{
+    let li = document.createElement('li');
+    li.textContent = "⭐ " + s;
+    leaderboardList.appendChild(li);
+  });
+}
+
+function updateProgress(guess){
+  let diff = Math.abs(secretNumber - guess);
+  let percent = 100 - (diff / maxRange) * 100;
+  progressBar.style.width = `${percent}%`;
+}
+
+function renderHistory(){
+    historyList.innerHTML = '';
+    history.forEach(num =>{
+      let li = document.createElement('li');
+      li.textContent = num;
+      historyList.appendChild(li);
+    });
+  }
 
 function startTimer(){
     clearInterval(timer);
@@ -140,8 +140,6 @@ function updateBadge(score){
 }
 
 function checkGuess(){
-  history.push(guess);
-  renderHistory()
   if(gameOver){
     return;
   }
@@ -152,7 +150,10 @@ function checkGuess(){
     guessInput.focus();
     return;
   }
-
+  
+  updateProgress(guess);
+  history.push(guess);
+  renderHistory()
   attempts++;
   updateDisplay();
   
@@ -165,6 +166,7 @@ function checkGuess(){
     }
     showMessage(`🎉Congratulations! You found the number ${secretNumber}!`, 'success');
     scoreDisplay.textContent = finalScore;
+    saveScore(finalScore);
     endGame();
   } else if(guess < secretNumber){
     const difference = secretNumber - guess;
@@ -224,6 +226,8 @@ function updateDisplay(){
 function endGame(){
   gameOver = true;
   clearInterval(timer);
+  const finalScore = parseInt(scoreDisplay.textContent);
+  updateBadge(finalScore);
   submitBtn.disabled = true;
   restartBtn.style.display = 'flex';
   hintBtn.style.display = 'none';
