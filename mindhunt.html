@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧠 MindHunt - A Brain Teaser</title>
+  <link rel="stylesheet" href="BrainArcade.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+</head>
+<body class="game-body">
+  <div class="noise-overlay"></div>
+  <div class="grid-bg"></div>
+  <div id="mh-toast" class=""></div>
+
+  <nav class="game-topbar">
+    <button class="back-btn" onclick="window.location.href='index.html'"><i class="bi bi-arrow-left"></i> Back</button>
+    <div class="topbar-game-title mindhunt-teal">🧠 MindHunt</div>
+    <div class="topbar-right">
+      <span class="mindhunt-text">BrainArcade</span>
+    </div>
+  </nav>
+
+  <div class="mindhunt-wrap">
+    <div class="mh-title-row">
+      <h1 class="mh-title">MindHunt</h1>
+      <p class="mh-sub">Think Fast. Guess Smart.</p>
+    </div>
+
+    <!-- Stats row -->
+    <div class="stats-row mh-stats">
+      <div class="stat-box">
+        <div class="stat-box-label">Time</div>
+        <div class="stat-box-val" id="mh-timer-val">60</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-label">Attempts</div>
+        <div class="stat-box-val" id="mh-attempts-val">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-label">Score</div>
+        <div class="stat-box-val" id="mh-score-val">100</div>
+        <div id="mh-badge" class="badge-pill">Beginner</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-label">Streak</div>
+        <div class="stat-box-val" id="mh-streak-val">0</div>
+      </div>
+    </div>
+
+    <div class="mh-layout">
+      <!-- main column -->
+      <div class="mh-main-col">
+        <!-- Difficulty -->
+        <div class="panel mh-panel">
+          <div class="panel-label">Difficulty</div>
+          <button class="diff-btn" id="mh-diff-btn">
+            <span id="mh-diff-label">Medium (0–100)</span>
+            <span class="chevron">▼</span>
+          </button>
+          <div class="diff-dropdown" id="mh-diff-dropdown">
+            <div class="diff-item" data-value="50">Easy &nbsp;<small class="mh-diff-item">0 – 50</small></div>
+            <div class="diff-item active" data-value="100">Medium &nbsp;<small class="mh-diff-item">0 – 100</small></div>
+            <div class="diff-item" data-value="500">Hard &nbsp;<small class="mh-diff-item">0 – 500</small></div>
+          </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="panel">
+          <div class="panel-label">How close are you?</div>
+          <div class="progress-track">
+            <div class="progress-fill" id="mh-progress"></div>
+          </div>
+          <div class="mh-warmth-meter">Warmth Meter</div>
+        </div>
+
+        <!-- Input -->
+        <div class="panel">
+          <div class="panel-label">Your Guess</div>
+          <div class="mh-input-row">
+            <input type="number" id="mh-input" class="mh-input" placeholder="Enter a number..." min="0" autocomplete="off" disabled>
+            <button class="btn-teal" id="mh-submit-btn" onclick="mhHandleStart()">🎯 Start Hunt</button>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="mh-actions">
+          <button class="btn-amber" id="mh-hint-btn" onclick="mhGetHint()">💡 Reveal Clue</button>
+          <button class="btn-coral hidden" id="mh-restart-btn" onclick="mhRestart()"><i class="bi bi-arrow-repeat"></i> Hunt Again</button>
+        </div>
+      </div>
+
+      <!-- Side Column -->
+      <div class="mh-side-col">
+        <!-- Guess history -->
+        <div class="panel">
+          <div class="panel-label">Guess History</div>
+          <ul class="chip-list" id="mh-history"></ul>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="panel">
+          <div class="panel-label"><i class="bi bi-trophy"></i> Leaderboard</div>
+          <ul class="chip-list" id="mh-leaderboard"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script src="mindhunt.js"></script>
+</body>
+</html>
