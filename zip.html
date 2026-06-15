@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚡ Zip — BrainArcade</title>
+  <link rel="stylesheet" href="BrainArcade.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+</head>
+<body class="game-body">
+  <div class="noise-overlay"></div>
+  <div class="grid-bg"></div>
+  <div id="zip-toast"></div>
+
+  <nav class="game-topbar">
+    <button class="back-btn" onclick="pageExit('index.html')">
+      <i class="bi bi-arrow-left"></i> Back
+    </button>
+    <div class="topbar-game-title zip-purple">⚡Zip</div>
+    <div class="topbar-right">
+      <span class="zip-text">BrainArcade</span>
+    </div>
+  </nav>
+  
+  <div class="zip-wrap">
+    <h1 class="zip-title">Zip</h1>
+    <p class="zip-sub">Connect the dots. Fill every cell. One path only.</p>
+
+    <div class="zip-stats">
+      <div class="stat-box">
+        <div class="stat-box-label">Puzzle</div>
+        <div class="stat-box-val" id="zip-puzzle-count">1</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-label">Moves</div>
+        <div class="stat-box-val" id="zip-moves">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-label">Solved</div>
+        <div class="stat-box-val" id="zip-solved" style="color:var(--teal)">0</div>
+      </div>
+    </div>
+
+    <!-- Main layout -->
+    <div class="zip-layout">
+
+      <!-- Left: canvas -->
+      <div class="zip-main-col">
+        <div id="zip-status" class="zip-status" style="color:var(--text-muted);">Draw a path from dot 1</div>
+        <div class="zip-grid-wrap" id="zip-grid-wrap">
+          <canvas id="zip-canvas"></canvas>
+        </div>
+        <div class="mh-actions">
+          <button class="btn-teal"  onclick="zipUndo()"><i class="bi bi-arrow-counterclockwise"></i> Undo</button>
+          <button class="btn-coral" onclick="zipReset()"><i class="bi bi-arrow-repeat"></i> Reset</button>
+          <button class="btn-amber" onclick="zipHint()"><i class="bi bi-lightbulb-fill"></i> Hint</button>
+        </div>
+      </div>
+
+      <!-- Right: puzzle picker + rules -->
+      <div class="zip-side-col">
+        <div class="panel">
+          <div class="panel-label">Select Puzzle</div>
+          <div class="zip-puzzle-select" id="zip-puzzle-select"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-label">How to Play</div>
+          <ul style="color:var(--text-muted);font-size:0.85rem;padding-left:16px;line-height:1.9;margin:0;">
+            <li>Start at dot <strong class="zip-purple">1</strong></li>
+            <li>Visit each number in order</li>
+            <li>Fill <strong>every</strong> cell exactly once</li>
+            <li>Move only ↑ ↓ ← → (no diagonals)</li>
+            <li>Do not cross thick walls</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <script src="app.js"></script>
+  <script src="zip.js"></script>
+</body>
+</html>

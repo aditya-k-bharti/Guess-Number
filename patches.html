@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🟦 Patches — BrainArcade</title>
+  <link rel="stylesheet" href="BrainArcade.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+</head>
+<body class="game-body">
+  <div class="noise-overlay"></div>
+  <div class="grid-bg"></div>
+  <div id="pt-toast"></div>
+
+  <nav class="game-topbar">
+    <button class="back-btn" onclick="pageExit('index.html')">
+      <i class="bi bi-arrow-left"></i> Back
+    </button>
+    <div class="topbar-game-title patches-amber">🟦 Patches</div>
+    <div class="topbar-right">
+      <span class="patches-text">BrainArcade</span>
+    </div>
+  </nav>
+
+  <div class="patches-wrap">
+    <h1 class="patches-title">Patches</h1>
+    <p class="patches-sub">Fill the grid. One rectangle per clue. No gaps, no overlaps.</p>
+
+    <!-- Stats — mirrors .hm-stats from Hangman -->
+    <div class="pt-stats">
+      <div class="stat-box">
+        <div class="stat-box-label">Puzzle</div>
+        <div class="stat-box-val" id="pt-puzzle-num">1</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-label">Patches Left</div>
+        <div class="stat-box-val" id="pt-remaining">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-label">Solved</div>
+        <div class="stat-box-val" id="pt-solved" style="color:var(--teal);">0</div>
+      </div>
+    </div>
+
+    <!-- Main layout -->
+    <div class="pt-layout">
+
+      <!-- Left: grid -->
+      <div class="pt-main-col">
+        <div id="pt-status" class="patches-status" style="color:var(--text-muted);">
+          Click &amp; drag to draw a rectangle
+        </div>
+        <div class="patches-grid-wrap" id="pt-grid"></div>
+        <div class="mh-actions">
+          <button class="btn-coral" onclick="ptUndo()"><i class="bi bi-arrow-counterclockwise"></i> Undo</button>
+          <button class="btn-amber" onclick="ptReset()"><i class="bi bi-arrow-repeat"></i> Reset</button>
+        </div>
+      </div>
+
+      <!-- Right: puzzle picker + rules + legend -->
+      <div class="pt-side-col">
+        <div class="panel">
+          <div class="panel-label">Select Puzzle</div>
+          <div id="pt-puzzle-select"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-label">How to Play</div>
+          <ul style="color:var(--text-muted);font-size:0.85rem;padding-left:16px;line-height:1.9;margin:0;">
+            <li>Click + drag to draw a <strong>rectangle</strong></li>
+            <li>Each rectangle must contain <strong>exactly one clue</strong></li>
+            <li>Clue number = total cells in that rectangle</li>
+            <li>Shape icons: <strong>▬</strong> wide · <strong>▮</strong> tall · <strong>■</strong> square · <strong>✦</strong> any</li>
+            <li>Cover <strong>every cell</strong> — no gaps, no overlaps</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <div class="panel-label">Legend</div>
+          <div class="patches-legend" id="pt-legend"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script src="patches.js"></script>
+</body>
+</html>
